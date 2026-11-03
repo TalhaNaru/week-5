@@ -1,3 +1,5 @@
+import { getConfig } from '@/lib/config';
+
 export type Country = {
   cca3: string;
   name: string;
@@ -20,18 +22,9 @@ type ApiResponse = {
   data: { objects: ApiCountry[]; meta: { more: boolean } };
 };
 
-const BASE_URL = 'https://api.restcountries.com/countries/v5';
 const FIELDS =
   'names.common,capitals,population,region,codes.alpha_3,flag.url_svg';
 const PAGE_SIZE = 100;
-
-function GetApiKey(): string {
-  const apikey = process.env.RESTCOUNTRIES_KEY;
-  if (!apikey) {
-    throw new Error('Missing API key: set RESTCOUNTRIES_KEY in .env.local');
-  }
-  return apikey;
-}
 
 function toCountry(item: ApiCountry): Country {
   return {
@@ -43,15 +36,16 @@ function toCountry(item: ApiCountry): Country {
     flag: item.flag.url_svg,
   };
 }
+
 export async function getCountries(): Promise<Country[]> {
-  const apiKey = GetApiKey();
+  const { apiKey, apiBaseUrl } = getConfig();
   const all: ApiCountry[] = [];
   let offset = 0;
   let more = true;
 
   while (more) {
     const response = await fetch(
-      `${BASE_URL}?response_fields=${FIELDS}&limit=${PAGE_SIZE}&offset=${offset}`,
+      `${apiBaseUrl}?response_fields=${FIELDS}&limit=${PAGE_SIZE}&offset=${offset}`,
       {
         headers: { Authorization: `Bearer ${apiKey}` },
         cache: 'no-store',
@@ -65,14 +59,16 @@ export async function getCountries(): Promise<Country[]> {
     more = json.data.meta.more;
     offset += PAGE_SIZE;
   }
+
   return all.map(toCountry);
 }
+
 export async function getCountryByCode(code: string): Promise<Country> {
-  //await new Promise((resolve) => setTimeout(resolve, 5000)); just to see the loading that we add
+  const { apiKey, apiBaseUrl } = getConfig();
   const response = await fetch(
-    `${BASE_URL}/codes.alpha_3/${encodeURIComponent(code)}?response_fields=${FIELDS}`,
+    `${apiBaseUrl}/codes.alpha_3/${encodeURIComponent(code)}?response_fields=${FIELDS}`,
     {
-      headers: { Authorization: `Bearer ${GetApiKey()}` },
+      headers: { Authorization: `Bearer ${apiKey}` },
       cache: 'no-store',
     },
   );

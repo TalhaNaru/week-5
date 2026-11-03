@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Country Explorer',
   description: 'Week 5 Next.js App Router',
 };
-
+const appName = process.env.NEXT_PUBLIC_APP_NAME ?? 'Country Explorer';
 export default function RootLayout({
   children,
 }: {
@@ -17,6 +17,7 @@ export default function RootLayout({
       <body>
         <header className="border-b border-gray-500/40">
           <nav className="mx-auto flex max-w-5xl gap-4 p-4 font-medium">
+            <span className="font-bold">{appName}</span>
             <Link href="/" className="hover:underline">
               Home
             </Link>
@@ -25,6 +26,9 @@ export default function RootLayout({
             </Link>
             <Link href="/about/team" className="hover:underline">
               Team
+            </Link>
+            <Link href="/feedback" className="hover:underline">
+              Feedback
             </Link>
           </nav>
         </header>
