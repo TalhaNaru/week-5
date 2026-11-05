@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Country Explorer, Next.js edition (Week 5)
 
-## Getting Started
+The Week 4 Country Explorer rebuilt with Next.js and the App Router. The country list is fetched on the server, and each country has its own detail page.
 
-First, run the development server:
+## Tech stack
+Next.js (App Router), React, TypeScript, Tailwind CSS, ESLint, Prettier
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Routes
+- `/` : country list with search and region filter
+- `/country/[code]` : country detail, for example `/country/PAK`
+- `/api/countries` : JSON endpoint (supports `?region=Europe`)
+
+## Features
+- Shared root layout with a navigation header on every page
+- List page is a server component that fetches data on the server
+- Search and region filter in a client component
+- Detail page shows name, capital, population, region, languages and border countries
+- Border countries link to their own detail pages with `<Link>`
+- `loading.tsx` and `error.tsx` for the detail route
+- Invalid codes show a not-found page instead of crashing
+- Configuration through environment variables
+
+## Server and client components
+| File | Type | Why |
+| --- | --- | --- |
+| app/layout.tsx | Server | Static shell and header |
+| app/page.tsx | Server | Fetches the list with await, no hooks |
+| components/CountryExplorer.tsx | Client | Needs state for search and region |
+| components/CountryCard.tsx | Display only | Rendered inside the client component |
+| app/country/[code]/page.tsx | Server | Reads the route parameter and fetches the country |
+| app/country/[code]/loading.tsx | Server | Static loading UI |
+| app/country/[code]/error.tsx | Client | Error boundaries must be client components |
+| app/country/[code]/not-found.tsx | Server | Static not-found UI |
+| lib/countries.ts | Server-side code | Uses the secret API key |
+
+## How to run
+1. npm install
+2. Get a free API key at https://restcountries.com/sign-up
+3. Copy `.env.example` to `.env.local` and set:
+   - RESTCOUNTRIES_KEY=your_key_here
+   - NEXT_PUBLIC_APP_NAME=Country Explorer
+4. npm run dev
+5. Open http://localhost:3000
+
+`RESTCOUNTRIES_KEY` has no NEXT_PUBLIC_ prefix, so it stays on the server and is never sent to the browser. `.env.local` is not committed.
+
+## Scripts
+- npm run dev : start the dev server
+- npm run build : build for production
+- npm run lint : run ESLint
+- npm run format : run Prettier
+
+## Project structure
+```
+src/
+  app/
+    layout.tsx
+    page.tsx
+    api/countries/route.ts
+    country/
+      layout.tsx
+      [code]/
+        page.tsx
+        loading.tsx
+        error.tsx
+        not-found.tsx
+  components/
+    CountryCard.tsx
+    CountryExplorer.tsx
+  lib/
+    config.ts
+    countries.ts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Week 5 plan
+| Day | Topic | Branch |
+| --- | --- | --- |
+| 1 | App Router, page.tsx, layout.tsx, Link | week-5/day-1-app-router |
+| 2 | Server vs client components, server-side fetching | week-5/day-2-server-client |
+| 3 | Dynamic routes, nested layouts, loading and error files | week-5/day-3-routing |
+| 4 | Route handlers and environment variables | week-5/day-4-route-handlers |
+| 5 | Country Explorer exercise | week-5/day-5-final |
